@@ -2,11 +2,18 @@ import os,datetime,sys
 import pytz
 import time
 
+"""
+
+Hacky way of getting departure times from MTA API
+
+
+"""
+
 from underground import metadata, SubwayFeed
 
-API_KEY = "7dPziNcZAO7I14bR1o5hD1RcW3trloOo1rgN0Vhu"
+API_KEY = "7dPziNcZAO7I14bR1o5hD1RcW3trloOo1rgN0Vhu" # API key
 
-## S = Downtown, N = Uptown
+# Color codes
 
 NoColor = "\033[0m"
 Red = "\u001b[31m"
@@ -15,6 +22,15 @@ Green = "\u001b[32m"
 Yellow = "\u001b[33m"
 Blue = "\u001b[34m"
 Purple = "\u001b[35m"
+
+
+# Indexed by line name
+# Color: Train Color
+# Station: Train station near HM
+# Terminal: Terminating station of the line
+# StationID: API Station tag
+
+## S = Downtown, N = Uptown
 
 train_data_map ={
  "B" :
@@ -146,17 +162,16 @@ def get_data(key,train_data,cur_date_time,  direction="Uptown"):
 	feed = SubwayFeed.get(key, api_key=API_KEY)
 	datetime_arrival = feed.extract_stop_dict()[key][s_id][0]
 	datetime_arrival = datetime_arrival.replace(tzinfo=None)
-#	print(repr(datetime_arrival))
-#	print(repr(cur))
-#	arrival_time = str(datetime_arrival.hour)+":"+str(datetime_arrival.minute)
-	arrival_time = datetime_arrival.strftime('%H:%M')
+	arrival_time = datetime_arrival.strftime("%M:%S")
+#	print("Arrive: " + repr(datetime_arrival))
+#	print("Cur: "+ repr(cur))
 	delta =  datetime_arrival-cur_date_time
-#	print(delta)
-#	sys.exit()
 	delta_time = str(delta).split(".")[0]
+#	print(delta_time)
 	terminal_output = " | ".join([train_data[key]["Color"], key , NoColor+  arrival_time,
 	delta_time, "at "+str(train_data[key]["Station"]),"to "+str(train_data[key][direction]["Terminal"])])
 	print(terminal_output)
+#	sys.exit()
 
 while(True):
 	os.system("clear")
@@ -174,5 +189,5 @@ while(True):
 	while(True):
 		cur_time = time.time()
 		dt = cur_time-start_time
-		if(dt >= 30):
+		if(dt >= 60):
 			break
