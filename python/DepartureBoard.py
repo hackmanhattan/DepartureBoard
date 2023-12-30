@@ -13,7 +13,7 @@ S***** I***** isn't queried for though. Why ask for something that doesn't exist
 
 API_KEY = "7dPziNcZAO7I14bR1o5hD1RcW3trloOo1rgN0Vhu" # Probably should just be a raw string... meh
 
-# Grouped by color
+# Grouped by color of trains. 7 doesn't work, and I haven't figured out LIRR yet (both should be feasible though?)
 API_Endpoints = [
 "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-ace",
 "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-bdfm",
@@ -44,8 +44,10 @@ station_name_map = {"127S": "42th Times Sq. ", "127N": "42th Times Sq. ",
 
 }
 
+# Map 1 letter direction to longer form direction
 dir_map = {"S": "Downtown ", "N": "Uptown "}
 
+# Data on nearby stations to HM
 nearby_stations = [
 {"Line": "B", "Dir": "N", "Station": "D17N", "Color": Orange},
 {"Line": "B", "Dir": "S", "Station": "D17S", "Color": Orange},
@@ -85,7 +87,7 @@ nearby_stations = [
 {"Line": "E", "Dir": "S", "Station": "A28S", "Color": Blue},
 ]
 
-# Make initial API queries
+# Setup initial API queries
 def init_feeds(endpoints):
 	return [NYCTFeed(endpoint,api_key= API_KEY) for endpoint in endpoints]
 
@@ -93,20 +95,24 @@ def refresh_feeds(feeds):
 	for feed in feeds:
 		feed.refresh()
 
+# function to see what the station IDs correspond to what names. Kind of broken right now
 def print_station_names(feed,dictionary):
 	line = feed.filter_trips(line_id=dictionary["Line"], travel_direction=dictionary["Dir"], headed_for_stop_id=dictionary["Station"])
 	print([[(v.stop_name,v.stop_id) for v in t.stop_time_updates] for t in line])
 
+# The heart of program. Given some train data, extract information and format it for terminal
 def format_trip(trip, dictionary, current_time):
 	for stop in trip.stop_time_updates:
 		if(stop.stop_id==dictionary["Station"]):
 			delta = format_delta(stop.arrival- current_time)
-			terminal_output = " | ".join([dictionary["Color"], dictionary["Line"] , NoColor+  stop.arrival.strftime("%H:%M:%S"),delta,
-			"at "+station_name_map[dictionary["Station"]],	dir_map[dictionary["Dir"]]+"to "+trip.headsign_text])
+			terminal_output = " | ".join([dictionary["Color"], dictionary["Line"] ,
+				 NoColor+  stop.arrival.strftime("%H:%M:%S"),delta,
+				"at "+station_name_map[dictionary["Station"]],
+				dir_map[dictionary["Dir"]]+"to "+trip.headsign_text])
 			return terminal_output
 	return ""
-#			print(trip.headsign_text, stop.arrival, stop.stop_name, stop.stop_id)
 
+# Convert timedelta to HH:MM:SS
 def format_delta(time_delta):
 	s = time_delta.seconds
 	hours, remainder = divmod(s, 3600)
@@ -114,7 +120,7 @@ def format_delta(time_delta):
 	out = '{:02}:{:02}:{:02}'.format(int(hours), int(minutes), int(seconds))
 	return out
 
-
+# Given a RTS feed and a dictionary of train data, see if train will arrive at nearby station
 def filter_feed(feed,dictionary, current_time):
 	routes = feed.filter_trips(line_id=dictionary["Line"], travel_direction=dictionary["Dir"])
 	if(len(routes) ==0):
@@ -131,6 +137,9 @@ def update_board(feeds,nearby_stations):
 # Yes, this is a stupid way of doing things. It works.
 # It also doesn't show trains that don't have any routes, like the B on weekends
 # We don't care about these though
+
+# it also doesn't work on the 7 since the API request is broken there
+# I havn't tried doing the LIRR though at Grand Central
 	cache = []
 	cur_time = datetime.datetime.now()
 	for feed in feeds:
