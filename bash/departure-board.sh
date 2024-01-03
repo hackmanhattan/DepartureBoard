@@ -16,8 +16,8 @@ RED='\033[0;31m'
 GREEN='\033[0;32m'
 BLUE='\033[0;34m'
 
-dataUptown=(
-	"MESSAGE:Uptown, The Bronx, & Upper Queens:"
+data=(
+	"MESSAGE:Uptown, The Bronx, & Upper Queens"
 	"B:34 Herald Sq.:D17N:145 St:$ORANGE"
 	"D:34 Herald Sq.:D17N:Norwood-205 St:$ORANGE"
 	"F:34 Herald Sq.:D17N:Jamaica-179 St:$ORANGE"
@@ -35,16 +35,33 @@ dataUptown=(
 	"A:Penn. Station:A28N:Inwood-207 St:$BLUE"
 	"C:Penn. Station:A28N:168 St:$BLUE"
 	"E:Penn. Station:A28N:Jamaica Center-Parsons/Archer:$BLUE"
+	"MESSAGE:Downtown, Brooklyn, & Lower Queens"
+	"B:34 Herald Sq.:D17S:Brighton Beach:$ORANGE"
+	"D:34 Herald Sq.:D17S:Coney Island-Stillwell Av:$ORANGE"
+	"F:34 Herald Sq.:D17S:Coney Island-Stillwell Av:$ORANGE"
+	"M:34 Herald Sq.:D17S:Middle Village-Metropolitan Av:$ORANGE"
+	"N:34 Herald Sq.:R17S:Coney Island-Stillwell Av:$YELLOW"
+	"Q:34 Herald Sq.:R17S:Coney Island-Stillwell Av:$YELLOW"
+	"R:34 Herald Sq.:R17S:Bay Ridge-95 St:$YELLOW"
+	"W:34 Herald Sq.:R17S:Whitehall St-South Ferry:$YELLOW"
+	"1:42 Times Squ.:128S:South Ferry:$RED"
+	"2:42 Times Squ.:128S:Flatbush Av - Brooklyn College:$RED"
+	"3:42 Times Squ.:128S:New Lots Av:$RED"
+	"4:Grand Central:631S:New Lots Av:$GREEN"
+	"5:Grand Central:631S:Flatbush Av - Brooklyn College:$GREEN"
+	"6:Grand Central:631S:Brooklyn Bridge-Cty Hall:$GREEN"
+	"A:Penn. Station:A28S:Rockaway Park-Beach 116 St:$BLUE"
+	"C:Penn. Station:A28S:Euclid Av:$BLUE"
+	"E:Penn. Station:A28S:World Trade Center:$BLUE"
 )
 
 while true
 do
-	clear
-	for info in "${dataUptown[@]}"
+	for info in "${data[@]}"
 	do
 		if [ $(echo $info | awk -F':' '{print $1}') == MESSAGE ]; then
 			sleep 0.3
-			echo ">" $(echo $info | awk -F':' '{print $2}')
+			echo ">" $(echo $info | awk -F':' '{print $2}') >> board
 		else
 			train=$(echo $info | awk -F':' '{print $1}')
 			stop=$(echo $info | awk -F':' '{print $2}')
@@ -67,8 +84,11 @@ do
 				fi
 			fi
 
-			echo -e ${color}\| $train \|${NC} $time \| $timeDelta \| at $stop \| to $destination
+			echo -e ${color}\| $train \|${NC} $time \| $timeDelta \| at $stop \| to $destination >> board
 		fi
 	done
-	sleep 60
+	
+	clear
+	echo "$(<board )"
+	echo "" > board
 done
