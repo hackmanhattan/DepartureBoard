@@ -77,11 +77,14 @@ def format_line(route_dict):
 #    output = train_color+" | "+route_dict["route_id"]+" | "+NoColor+" | "+  military_time + " | in " +time_delta + " | at " + route_dict["station"]
     output = train_color+" | "+route_dict["route_id"]+" | "+NoColor+" | "+  military_time + " | in " +time_delta + " | at " + nearby_station_ids[route_dict["station_id"]]
     output += "| to " +station_map[route_dict["dest_stop"]]
-    print(output)
+    cmd = "echo \"" + output + "\""
+    os.system(cmd)
+#    print(output)
     return output
 
 def refresh(station_ids):
     api_results  = [gen_json(cur_id) for cur_id in station_ids]
+    os.system("date +\"%H:%M\" | figlet | lolcat")
     print("Uptown: The Bronx, & Upper Queens")
     build_station_arrival_times(api_results, "north")
     print("Downtown: Brooklyn & Lower Queens")
@@ -89,5 +92,6 @@ def refresh(station_ids):
     time.sleep(30)
     os.system("clear")
 
+os.system("clear")
 while(True):
     refresh(station_ids)
