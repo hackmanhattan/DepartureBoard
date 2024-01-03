@@ -1,4 +1,4 @@
-import requests, json, time, datetime, os
+import requests, json, time, datetime, os, sys
 
 # Color codes for terminal output
 
@@ -13,10 +13,10 @@ Purple = "\u001b[35m"
 color_map = {"B":Orange, "D": Orange, "F": Orange, "M": Yellow, "Q": Yellow, "N": Yellow, "R": Yellow, "W": Yellow,
 "1": Red, "2": Red, "3": Red, "7": Purple, "4": Green, "5": Green, "6": Green, "A": Blue, "C": Blue, "E": Blue}
 
-station_ids = ['D17', 'R17', '127', '631', 'A28']
+station_ids = ['D17', 'R17', '127', '631', 'A28', '725']
 
 nearby_station_ids = {'D17': "34 Herald Sq.", "R17":"34 Herald Sq.",
- "127":"42 Times Squ.", "631":"Grand Central", "A28":"Penn. Station"}
+ "127":"42 Times Squ.", "725":"42 Times Squ.","631":"Grand Central", "A28":"Penn. Station"}
 
 def gen_stop_dictionary():
     res = requests.get("https://goodservice.io/api/stops")
@@ -26,10 +26,6 @@ def gen_stop_dictionary():
     for item in api_call["stops"]:
         output[item["id"]] = item["name"]
     return output
-
-station_map = gen_stop_dictionary()
-
-cur_time = time.time()
 
 def gen_json(url):
     res = requests.get('https://goodservice.io/api/stops/'+url)
@@ -92,6 +88,12 @@ def refresh(station_ids):
     time.sleep(30)
     os.system("clear")
 
-os.system("clear")
-while(True):
-    refresh(station_ids)
+
+if __name__ == "__main__":
+    station_map = gen_stop_dictionary()
+#    print(station_map)
+#    sys.exit()
+    cur_time = time.time()
+    os.system("clear")
+    while(True):
+        refresh(station_ids)
