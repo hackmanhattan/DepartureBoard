@@ -56,23 +56,35 @@ def build_station_arrival_times(api_results, direction):
                 found.append(route_id)
             test_time = train["arrival_time"]
             if route_id not in trips:
-                trips[route_id] = train
+## Single Stop
+#                trips[route_id] = train
+## Multi Stop
+                trips[route_id] = [train]
             else:
-                if(test_time <= trips[route_id]["arrival_time"]):
-                    trips[route_id] = train
+## Single Stop
+#                if(test_time <= trips[route_id]["arrival_time"]):
+#                    trips[route_id] = train
+## Multi Stop
+                if(len(trips[route_id]) < 3):
+                    trips[route_id].append(train)
         closest_times.update(trips)
 #    print(found)
     for route in closest_times:
         format_line(closest_times[route])
 
-def format_line(route_dict):
-#    output = route_dict[]
-    train_color = color_map[route_dict["route_id"]]
-    time_delta = time.strftime('%Mm', time.gmtime(route_dict["arrival_time"]-cur_time))
-    military_time = time.strftime('%H:%M', time.localtime(route_dict["arrival_time"]))
-#    output = train_color+" | "+route_dict["route_id"]+" | "+NoColor+" | "+  military_time + " | in " +time_delta + " | at " + route_dict["station"]
-    output = train_color+" | "+route_dict["route_id"]+" | "+NoColor+" | "+  military_time + " | in " +time_delta + " | at " + nearby_station_ids[route_dict["station_id"]]
-    output += "| to " +station_map[route_dict["dest_stop"]]
+def format_line(route_list):
+#    output = route_list[]
+    route_list.sort(key = lambda x: x["arrival_time"])
+    route = route_list[0]
+    train_color = color_map[route["route_id"]]
+    military_time = time.strftime('%H:%M', time.localtime(route["arrival_time"]))
+## Single Line
+#    time_delta = time.strftime('%H:%M', time.gmtime(route_list["arrival_time"]-cur_time))
+## MultiLine
+    time_ds = [time.strftime('%Mm', time.gmtime(hit["arrival_time"]-cur_time)) for hit in route_list]
+    time_delta = ",".join(time_ds)
+    output = train_color+" | "+route["route_id"]+" | "+NoColor+" | "+  military_time + " | in " +time_delta + " | at " + nearby_station_ids[route["station_id"]]
+    output += "| to " +station_map[route["dest_stop"]]
     cmd = "echo \"" + output + "\""
     os.system(cmd)
 #    print(output)
