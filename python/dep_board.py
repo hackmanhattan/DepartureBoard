@@ -13,10 +13,10 @@ Purple = "\u001b[35m"
 color_map = {"B":Orange, "D": Orange, "F": Orange, "M": Yellow, "Q": Yellow, "N": Yellow, "R": Yellow, "W": Yellow,
 "1": Red, "2": Red, "3": Red, "7": Purple, "4": Green, "5": Green, "6": Green, "A": Blue, "C": Blue, "E": Blue}
 
-station_ids = ['D17', 'R17', '127', '631', 'A28', '725']
+station_ids = ['D17', 'R17', '127', '631', 'A28', '724']
 
 nearby_station_ids = {'D17': "34 Herald Sq.", "R17":"34 Herald Sq.",
- "127":"42 Times Squ.", "725":"42 Times Squ.","631":"Grand Central", "A28":"Penn. Station"}
+ "127":"42 Times Squ.","724":"5th Av.      ","631":"Grand Central", "A28":"Penn. Station"}
 
 def gen_stop_dictionary():
     res = requests.get("https://goodservice.io/api/stops")
@@ -91,8 +91,6 @@ def refresh(station_ids):
 
 if __name__ == "__main__":
     station_map = gen_stop_dictionary()
-#    print(station_map)
-#    sys.exit()
     cur_time = time.time()
     os.system("clear")
     while(True):
