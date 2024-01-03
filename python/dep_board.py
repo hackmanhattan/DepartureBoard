@@ -15,6 +15,9 @@ color_map = {"B":Orange, "D": Orange, "F": Orange, "M": Yellow, "Q": Yellow, "N"
 
 station_ids = ['D17', 'R17', '127', '631', 'A28']
 
+nearby_station_ids = {'D17': "34 Herald Sq.", "R17":"34 Herald Sq.",
+ "127":"42 Times Squ.", "631":"Grand Central", "A28":"Penn. Station"}
+
 def gen_stop_dictionary():
     res = requests.get("https://goodservice.io/api/stops")
     api_call = json.loads(res.text)
@@ -40,13 +43,14 @@ def build_station_arrival_times(api_results, direction):
     found = []
     for result in api_results:
         station_name = result["name"]
+        nearby_station_id = result["id"]
         if station_name not in trains:
             trains[station_name] = {}
         if(direction=="north"):
             lst =  result["upcoming_trips"]["north"]
         else:
             lst =  result["upcoming_trips"]["south"]
-        times = [{"station": station_name, "route_id": train['route_id'], "dir": train["direction"], 
+        times = [{"station": station_name,"station_id": nearby_station_id , "route_id": train['route_id'], "dir": train["direction"], 
                     'dest_stop': train["destination_stop"], "arrival_time": train["current_stop_arrival_time"] }   for train in lst]
 #        (station_name, train['route_id'], train['direction'], train['destination_stop'], train["current_stop_arrival_time"])
         trips = {}
@@ -62,15 +66,17 @@ def build_station_arrival_times(api_results, direction):
                     trips[route_id] = train
         closest_times.update(trips)
 #    print(found)
-    return [format_line(closest_times[route]) for route in closest_times]
+    for route in closest_times:
+        format_line(closest_times[route])
 
 def format_line(route_dict):
 #    output = route_dict[]
     train_color = color_map[route_dict["route_id"]]
-    time_delta = time.strftime('%H:%M', time.gmtime(route_dict["arrival_time"]-cur_time))
+    time_delta = time.strftime('%Mm', time.gmtime(route_dict["arrival_time"]-cur_time))
     military_time = time.strftime('%H:%M', time.localtime(route_dict["arrival_time"]))
-    output = train_color+" | "+route_dict["route_id"]+" | "+NoColor+" | "+  military_time + " | in " +time_delta + " | at " + route_dict["station"]
-    output += " to " +station_map[route_dict["dest_stop"]]
+#    output = train_color+" | "+route_dict["route_id"]+" | "+NoColor+" | "+  military_time + " | in " +time_delta + " | at " + route_dict["station"]
+    output = train_color+" | "+route_dict["route_id"]+" | "+NoColor+" | "+  military_time + " | in " +time_delta + " | at " + nearby_station_ids[route_dict["station_id"]]
+    output += "| to " +station_map[route_dict["dest_stop"]]
     print(output)
     return output
 
