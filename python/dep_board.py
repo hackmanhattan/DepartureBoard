@@ -76,14 +76,17 @@ def format_line(route_list):
 #    output = route_list[]
     route_list.sort(key = lambda x: x["arrival_time"])
     route = route_list[0]
-    train_color = color_map[route["route_id"]]
+    train_color = color_map[route["route_id"].replace("X","")]
     military_time = time.strftime('%H:%M', time.localtime(route["arrival_time"]))
 ## Single Line
 #    time_delta = time.strftime('%H:%M', time.gmtime(route_list["arrival_time"]-cur_time))
 ## MultiLine
     time_ds = [time.strftime('%Mm', time.gmtime(hit["arrival_time"]-cur_time)) for hit in route_list]
     time_delta = ",".join(time_ds)
-    output = train_color+" | "+route["route_id"]+" | "+NoColor+" | "+  military_time + " | in " +time_delta + " | at " + nearby_station_ids[route["station_id"]]
+    if("X" in route["route_id"]):
+        output = train_color+" | "+route["route_id"]+" | "+NoColor+" | "+  military_time + " | in " +time_delta + " | at " + nearby_station_ids[route["station_id"]]
+    else:
+        output = train_color+" | "+route["route_id"]+"  | "+NoColor+" | "+  military_time + " | in " +time_delta + " | at " + nearby_station_ids[route["station_id"]]
     output += "| to " +station_map[route["dest_stop"]]
     cmd = "echo \"" + output + "\""
     os.system(cmd)
