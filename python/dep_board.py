@@ -18,6 +18,8 @@ station_ids = ['D17', 'R17', '127', '631', 'A28', '724']
 nearby_station_ids = {'D17': "34 Herald Sq.", "R17":"34 Herald Sq.",
  "127":"42 Times Squ.","724":"5th Av.      ","631":"Grand Central", "A28":"Penn. Station"}
 
+seconds_in_hour = 3600
+
 def gen_stop_dictionary():
     res = requests.get("https://goodservice.io/api/stops")
     api_call = json.loads(res.text)
@@ -81,7 +83,8 @@ def format_line(route_list):
 ## Single Line
 #    time_delta = time.strftime('%H:%M', time.gmtime(route_list["arrival_time"]-cur_time))
 ## MultiLine
-    time_ds = [time.strftime('%Mm', time.gmtime(hit["arrival_time"]-cur_time)) for hit in route_list]
+    cur_time = time.time()
+    time_ds = [time.strftime('%Mm' if hit["arrival_time"]-cur_time < seconds_in_hour else '%Hh', time.gmtime(hit["arrival_time"]-cur_time)) for hit in route_list]
     time_delta = ",".join(time_ds)
     if("X" in route["route_id"]):
         output = train_color+" | "+route["route_id"]+" | "+NoColor+" | "+  military_time + " | in " +time_delta + " | at " + nearby_station_ids[route["station_id"]]
@@ -106,7 +109,6 @@ def refresh(station_ids):
 
 if __name__ == "__main__":
     station_map = gen_stop_dictionary()
-    cur_time = time.time()
     os.system("clear")
     while(True):
         refresh(station_ids)
