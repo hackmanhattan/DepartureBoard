@@ -122,16 +122,18 @@ def format_line(route_list):
 # Single Line
 #    time_delta = time.strftime('%H:%M', time.gmtime(route_list["arrival_time"]-cur_time))
 # MultiLine
-    time_ds = [
-        time.strftime(
-            '%Mm',
-            time.gmtime(
-                hit["arrival_time"] -
-                cur_time)) for hit in route_list]
+    time_ds = []
+    for hit in route_list:
+        tds = time.gmtime(hit["arrival_time"] -cur_time)
+        hr = int(time.strftime("%H", tds))
+        if(hr > 0):
+            time_ds.append("hr+")
+        else:
+            time_ds.append(time.strftime('%Mm',tds) )
     if len(time_ds) < 3:
         for i in range(3 - len(time_ds)):
             time_ds.append("---")
-    time_delta = ",".join(time_ds)
+    time_delta = ", ".join(time_ds)
     if ("X" in route["route_id"]):
         output = train_color + " | " + route["route_id"] + " | " + NoColor + " | " + \
             military_time + " | in " + time_delta + " | at " + nearby_station_ids[route["station_id"]]
