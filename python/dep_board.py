@@ -72,11 +72,17 @@ def gen_stop_dictionary():
     return output
 
 
-def gen_json(station_id):
+def get_station_data(station_id):
 # returns raw json from API call for a given station
-    res = requests.get('https://goodservice.io/api/stops/' + station_id)
-    api_call = json.loads(res.text)
-    res.close()
+    break_out = 1
+    while break_out:
+        res = requests.get('https://goodservice.io/api/stops/' + station_id)
+        if res.ok:
+            api_call = json.loads(res.text)
+            break_out = 0
+        else:
+            res.close()
+            time.sleep(5)
     return api_call
 
 
@@ -158,9 +164,9 @@ def refresh(station_ids):
 # Update local time
     cur_time = time.time()
 # Grab all relavent stations from API
-    api_results = [gen_json(cur_id) for cur_id in station_ids]
+    api_results = [get_station_data(cur_id) for cur_id in station_ids]
 # Format current time to screen
-    os.system("date +\"%H:%M\" | figlet | lolcat")
+    os.system("date +\"%H:%M\" | figlet")
 # Get data and print to screen
     print("Uptown: The Bronx, & Upper Queens")
     build_station_arrival_times(api_results, "north")
