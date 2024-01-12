@@ -81,7 +81,6 @@ def get_station_data(station_id):
             break_out = 0
         except:
 # Request failed for whatever reason. Wait, then try again. You can get stun locked though... o' well.
-            res.close()
             time.sleep(5)
     api_call = json.loads(res.text)
     return api_call
