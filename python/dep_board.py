@@ -134,6 +134,7 @@ def format_line(route_list):
 # Store time deltas (ie. different between arrival time and current time)
     time_ds = []
 # Limit results to next 3 trains
+    closest_arrival_time = time.strftime('%H:%M', time.localtime( route_list[0]["arrival_time"]))
     for hit in route_list[:3]:
 # Convert UNIX-epoch time to H:M format for arrival time of train
         military_time = time.strftime('%H:%M', time.localtime( hit["arrival_time"]))
@@ -153,10 +154,10 @@ def format_line(route_list):
 # Edge cases: X means express line, so need to mess with width of route["route_id"]. GS obeys same rules as express lines
     if (("X" in route["route_id"]) or ("GS" in route["route_id"]) ):
         output = train_color + " | " + route["route_id"] + " | " + NoColor + " | " + \
-            military_time + " | in " + time_delta + " | at " + nearby_station_ids[route["station_id"]]
+            closest_arrival_time + " | in " + time_delta + " | at " + nearby_station_ids[route["station_id"]]
     else:
         output = train_color + " | " + route["route_id"] + "  | " + NoColor + " | " + \
-            military_time + " | in " + time_delta + " | at " + nearby_station_ids[route["station_id"]]
+            closest_arrival_time + " | in " + time_delta + " | at " + nearby_station_ids[route["station_id"]]
     output += "| to " + station_map[route["dest_stop"]]
     return output
 
