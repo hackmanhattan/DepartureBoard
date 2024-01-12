@@ -162,8 +162,6 @@ def format_line(route_list):
 
 def refresh(station_ids):
 ## refreshes information from API
-# Update local time
-    cur_time = time.time()
 # Grab all relavent stations from API
     api_results = [get_station_data(cur_id) for cur_id in station_ids]
 # Format current time to screen
@@ -187,3 +185,4 @@ if __name__ == "__main__":
     os.system("clear")
     while (True):
         refresh(station_ids)
+        cur_time = time.time()
