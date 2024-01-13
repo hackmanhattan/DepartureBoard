@@ -75,14 +75,16 @@ def gen_stop_dictionary():
 def get_station_data(station_id):
 # returns raw json from API call for a given station
     break_out = 1
+    api_call = None
     while break_out:
         try:
             res = requests.get('https://goodservice.io/api/stops/' + station_id)
+            api_call = json.loads(res.text)
             break_out = 0
+            res.close()
         except:
 # Request failed for whatever reason. Wait, then try again. You can get stun locked though... o' well.
             time.sleep(5)
-    api_call = json.loads(res.text)
     return api_call
 
 
